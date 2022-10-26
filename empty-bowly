@@ -18,45 +18,53 @@ chooseOption() {
 		case $option in
 			"Generally clear any evidence") general;;
 			"clear logs for  user $USER" ) logs;;
-			"Clear bash history and permenently disable it") history;;
+			"Clear bash history and permenently disable it") Istory;;
 			"exit") exit;;
 			*) echo "Invalid argument...choose from menu";;
 		esac
 	done
 }
 
-syslogs() {
-	LOGS_FILES=(
-        /var/log/messages*
-	/var/log/macchanger.log*
-        /var/log/auth.log*
-        /var/log/kern.log
-        /var/log/cron.log
-        /var/log/maillog
-        /var/log/boot.log*
-	/var/log/user.log*
-        /var/log/mysqld.log 
-        /var/log/qmail
-        /var/log/httpd
-        /var/log/lighttpd
-        /var/log/secure
-	#additional logs
+#general logs deletion generator
 
-        /var/log/utmp
-        /var/log/wtmp
-        /var/log/yum.log
-        /var/log/system.log
-        /var/log/DiagnosticMessages
-        /Library/Logs
-        /Library/Logs/DiagnosticReports
-        ~/Library/Logs
-        ~/Library/Logs/DiagnosticReports
-}
-general() {
-	for i in ${syslogs[@]}
-	do
-		echo "checked $i"
 
-chooseOption
-done
+
+Istory () {
+
+	$(sudo shred -f -n 20 ~/.bash_history)
+	echo "[+] ~/bash_history shreded."
+
+	$(sudo shred -f -n 20 ~/.zsh_history)
+	echo "[+] ~/.zsh_history shreded."
+
+	history -c 
+	echo "[+] history cleared."
 }
+Istory
+
+
+general () {
+	echo "[+] Shredding log files for $USER"
+	sudo shred -fz -n 10 /var/log/* 2>>errors.txt
+
+	echo "[+] Disabling logging system"
+	service rsyslog stop
+
+	echo "[+] Deleting history"
+	export HISTFILESIZE=0
+        export HISTSIZE=0
+	echo "[+] Deleted history"
+
+	echo "[+] Shredding .bash_history file"
+	sudo shred -f ~/.bash_history
+	sleep 2
+	echo "[+] Shredding .zsh_history file"
+	sudo shred -f -n 20 ~/.zsh_history
+	sleep 1
+	echo "[+] Disabaling history"
+	shopt -ou history
+}
+general
+
+
+
