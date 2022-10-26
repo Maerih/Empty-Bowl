@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+rulinered="\033[4;31;40m"
+lyon="\033[36;40m"
+red="\033[31;40m"
+magneta="\033[35;40m"
+none="\033[0m"
+bold="\033[1m"
+
+echo -e "\t\tPowered by"
+echo -e $red $bold "\t\t\033[5mMaerih\033[0m"
+
+
+
+chooseOption() {
+	select option in "Generally clear any evidence" "clear logs for  user $USER" "Clear bash history and permenently disable it" "exit"
+	do
+		case $option in
+			"Generally clear any evidence") general;;
+			"clear logs for  user $USER" ) logs;;
+			"Clear bash history and permenently disable it") history;;
+			"exit") exit;;
+			*) echo "Invalid argument...choose from menu";;
+		esac
+	done
+}
+
+syslogs() {
+	LOGS_FILES=(
+        /var/log/messages*
+	/var/log/macchanger.log*
+        /var/log/auth.log*
+        /var/log/kern.log
+        /var/log/cron.log
+        /var/log/maillog
+        /var/log/boot.log*
+	/var/log/user.log*
+        /var/log/mysqld.log 
+        /var/log/qmail
+        /var/log/httpd
+        /var/log/lighttpd
+        /var/log/secure
+	#additional logs
+
+        /var/log/utmp
+        /var/log/wtmp
+        /var/log/yum.log
+        /var/log/system.log
+        /var/log/DiagnosticMessages
+        /Library/Logs
+        /Library/Logs/DiagnosticReports
+        ~/Library/Logs
+        ~/Library/Logs/DiagnosticReports
+}
+general() {
+	for i in ${syslogs[@]}
+	do
+		echo "checked $i"
+
+chooseOption
+done
+}
