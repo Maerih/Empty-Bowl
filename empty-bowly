@@ -8,7 +8,7 @@ none="\033[0m"
 bold="\033[1m"
 
 echo -e "\t\tPowered by"
-echo -e $red $bold "\t\t\033[5mMaerih\033[0m"
+echo -e $red $bold "\t\t\033[5mMaerih&Walobwa\033[0m"
 
 
 
