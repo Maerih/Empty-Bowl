@@ -5,42 +5,42 @@ lyon="\033[36;40m"
 red="\033[31;40m"
 magneta="\033[35;40m"
 none="\033[0m"
-bold="\033[1m"
+bold="\033[1m" 
 
 echo -e "\t\tPowered by"
 echo -e $red $bold "\t\t\033[5mMaerih&Walobwa\033[0m"
+echo
+
+printf "\tBash Version:\t%s\n" $BASH_VERSION
+echo
 
 
+case $1 in
+	"logs")
 
-chooseOption() {
-	select option in "Generally clear any evidence" "clear logs for  user $USER" "Clear bash history and permenently disable it" "exit"
-	do
-		case $option in
-			"Generally clear any evidence") general;;
-			"clear logs for  user $USER" ) logs;;
-			"Clear bash history and permenently disable it") Istory;;
-			"exit") exit;;
-			*) echo "Invalid argument...choose from menu";;
-		esac
-	done
+
+IsRoot () {
+        if [ "$EUID" -ne 0 ]; then
+                return 1
+        fi
 }
-
 #general logs deletion generator
 
-
-
 Istory () {
-
-	$(sudo shred -f -n 20 ~/.bash_history)
+	echo "[+] history clearing"
+	sudo shred -f -n 20 ~/.bash_history
+	echo "" > ~/.bash_history
 	echo "[+] ~/bash_history shreded."
 
-	$(sudo shred -f -n 20 ~/.zsh_history)
+	sudo shred -f -n 20 ~/.zsh_history
+	echo "" > ~/.zsh_history
 	echo "[+] ~/.zsh_history shreded."
 
 	history -c 
 	echo "[+] history cleared."
+	chooseOption
 }
-Istory
+
 
 
 general () {
@@ -63,8 +63,61 @@ general () {
 	sleep 1
 	echo "[+] Disabaling history"
 	shopt -ou history
+	chooseOption
 }
-general
 
 
 
+disable () {
+	ln /dev/null /var/log/auth.log -sf
+        echo "[+] Permanently sending /var/log/auth.log to /dev/null"
+
+	ln /dev/null ~/.bash_history -sf
+        echo "[+] Permanently sending bash_history to /dev/null"
+
+	set +o history
+        echo "[+] Disabled history library"
+
+        echo
+        echo "Permenently disabled bash log."
+
+	HISTSIZE=0
+	echo "[+] Set HISTFILESIZE & HISTSIZE to 0"
+	chooseOption
+}
+
+
+enableserv () {
+         rm -rf /var/log/auth.log
+         echo "" > /var/log/auth.log
+         echo "[+] Disabled sending auth logs to /dev/null"
+
+         rm -rf ~/.bash_history
+         echo "" > ~/.bash_history
+         echo "[+] Disabled sending history to /dev/null"
+
+         rm -rf ~/.zsh_history
+         echo "" > ~/.zsh_history
+         echo "[+] Disabled sending zsh history to /dev/null"
+
+         export HISTSIZE=50000
+         echo "[+] Restore HISTFILESIZE & HISTSIZE default values."
+
+         set -o history
+         echo "[+] Enabled history library"
+         chooseOption 
+}
+
+
+chooseOption() {
+	 select option in "clear logs for  user $USER" "Clear bash history and permenently disable it" "Disable systemlog and history" "Enable systemlog Settings to default" "exit"
+	do
+                case $option in
+                        "clear any logs for  user $USER" ) general;;
+                        "Clear bash history and permenently disable it") Istory;;
+                        "Disable systemlog and History") disable;;
+                        "Enable systemlog Settings to default") enableserv;;
+                        "exit") exit;;
+                esac
+        done
+}
