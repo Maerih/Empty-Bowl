@@ -50,7 +50,7 @@ General () {
 
 	echo "[+] Disabling logging system"
 	sudo service rsyslog stop
-	echo "[+] Permentently Disable logging from rsyslog.service/socket
+	echo "[+] Permentently Disable logging from rsyslog.service/socket"
 	sudo service rsyslog disable
 	sleep 3
 
