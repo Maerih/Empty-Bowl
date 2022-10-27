@@ -10,13 +10,10 @@ bold="\033[1m"
 echo -e "\t\tPowered by"
 echo -e $red $bold "\t\t\033[5mMaerih&Walobwa\033[0m"
 echo
-
+sleep 3
 printf "\tBash Version:\t%s\n" $BASH_VERSION
 echo
 
-
-case $1 in
-	"logs")
 
 
 IsRoot () {
@@ -24,70 +21,79 @@ IsRoot () {
                 return 1
         fi
 }
-#general logs deletion generator
+#generators
 
 Istory () {
 	echo "[+] history clearing"
+	sleep 2
 	sudo shred -f -n 20 ~/.bash_history
 	echo "" > ~/.bash_history
 	echo "[+] ~/bash_history shreded."
+	sleep 3
 
 	sudo shred -f -n 20 ~/.zsh_history
 	echo "" > ~/.zsh_history
 	echo "[+] ~/.zsh_history shreded."
-
+	sleep 2
 	history -c 
 	echo "[+] history cleared."
+	sleep 3
 	chooseOption
 }
+	
 
 
-
-general () {
+General () {
 	echo "[+] Shredding log files for $USER"
-	sudo shred -fz -n 10 /var/log/* 2>>errors.txt
+#	sudo shred -fz -n 10 /var/log/* 2>>errors.txt
+	sleep 3
 
 	echo "[+] Disabling logging system"
-	service rsyslog stop
+	sudo service rsyslog stop
+	echo "[+] Permentently Disable logging from rsyslog.service/socket
+	sudo service rsyslog disable
+	sleep 3
 
 	echo "[+] Deleting history"
 	export HISTFILESIZE=0
         export HISTSIZE=0
 	echo "[+] Deleted history"
-
+	sleep 4
 	echo "[+] Shredding .bash_history file"
 	sudo shred -f ~/.bash_history
 	sleep 2
 	echo "[+] Shredding .zsh_history file"
 	sudo shred -f -n 20 ~/.zsh_history
-	sleep 1
+	sleep 2
 	echo "[+] Disabaling history"
 	shopt -ou history
+	sleep 3
 	chooseOption
 }
 
 
 
-disable () {
-	ln /dev/null /var/log/auth.log -sf
+Disable () {
+	ln /dev/null /var/log/auth.log -sf  2>>errors.txt
         echo "[+] Permanently sending /var/log/auth.log to /dev/null"
-
+	sleep 3
 	ln /dev/null ~/.bash_history -sf
         echo "[+] Permanently sending bash_history to /dev/null"
-
+	sleep 2
 	set +o history
         echo "[+] Disabled history library"
-
+	sleep 3
         echo
         echo "Permenently disabled bash log."
-
+	sleep 2
 	HISTSIZE=0
 	echo "[+] Set HISTFILESIZE & HISTSIZE to 0"
+	sleep 3
 	chooseOption
 }
 
 
-enableserv () {
+Enableserv () {
          rm -rf /var/log/auth.log
          echo "" > /var/log/auth.log
          echo "[+] Disabled sending auth logs to /dev/null"
@@ -108,16 +114,27 @@ enableserv () {
          chooseOption 
 }
 
+#menu choose options
 
 chooseOption() {
-	 select option in "clear logs for  user $USER" "Clear bash history and permenently disable it" "Disable systemlog and history" "Enable systemlog Settings to default" "exit"
+	 select option in "clear any logs for user $USER" "Clear bash history and permenently disable it" "Disable systemlog and history" "Enable systemlog Settings to default" "Exit"
 	do
                 case $option in
-                        "clear any logs for  user $USER" ) general;;
+                        "clear any logs for user $USER" ) General;;
                         "Clear bash history and permenently disable it") Istory;;
-                        "Disable systemlog and History") disable;;
-                        "Enable systemlog Settings to default") enableserv;;
-                        "exit") exit;;
+                        "Disable systemlog and history") Disable;;
+                        "Enable systemlog Settings to default") Enableserv;;
+                        "Exit") exit;;
+			*) echo "Please choose from the menu.";;
                 esac
         done
 }
+
+
+case $1 in
+	"General") General;;
+	"Istory") Istory;;
+	"Disable") Disable;;
+	"Enableserv") Enableserv;;
+	*) chooseOption;;
+esac
